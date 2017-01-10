@@ -14,6 +14,9 @@ var ENTRY_FILE = './src/index.js';
 var target = process.env.npm_lifecycle_event;
 var targetEnv = target === 'build' ? PRODUCTION : DEVELOPMENT;
 
+var projectDir = path.resolve(__dirname + '/..');
+console.log('projectDir', projectDir)
+
 /*
 Shared configuration for both dev and production
 */
@@ -79,7 +82,7 @@ var devConfig = {
       {
         test: /\.elm$/,
         exclude: [/elm-stuff/, /node_modules/],
-        loader: 'elm-hot!elm-webpack?verbose=true&warn=true&debug=true',
+        loader: 'elm-hot!elm-webpack?verbose=true&warn=true&debug=true&cwd=' + projectDir,
       },
     ],
 

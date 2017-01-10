@@ -14,4 +14,4 @@ Render the view
 -}
 view : Html msg
 view =
-    text "Select 1"
+    text "Select 2"

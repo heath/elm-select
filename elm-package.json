@@ -4,7 +4,8 @@
     "repository": "https://github.com/sporto/elm-select.git",
     "license": "MIT",
     "source-directories": [
-        "src/"
+        "src/",
+        "example/src"
     ],
     "exposed-modules": [
         "Select"
