@@ -8,8 +8,8 @@ import Select.Select.Menu
 import Select.Select.Input
 
 
-view : Config msg item -> State -> List item -> Maybe item -> Html (Msg item)
-view config model items selected =
+view : Config -> ViewArgs msg item -> Html msg
+view config viewArgs =
     let
         classes =
             "elm-select"
@@ -17,7 +17,7 @@ view config model items selected =
         styles =
             [ ( "position", "relative" ) ]
     in
-        div [ id model.id, class classes, style styles ]
-            [ Select.Select.Input.view config model selected
-            , Select.Select.Menu.view config model items selected
+        div [ id viewArgs.id, class classes, style styles ]
+            [ Select.Select.Input.view config viewArgs
+            , Select.Select.Menu.view config viewArgs
             ]

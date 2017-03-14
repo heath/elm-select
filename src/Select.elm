@@ -89,8 +89,12 @@ import Select.Update
 {-|
 Opaque type that holds the configuration
 -}
-type Config msg item
-    = PrivateConfig (Models.Config msg item)
+type Config
+    = PrivateConfig Models.Config
+
+
+type alias ViewArgs msg item =
+    Models.ViewArgs msg item
 
 
 {-|
@@ -108,17 +112,14 @@ type Msg item
 
 
 {-|
-Create a new configuration. This takes:
-
-- A message to trigger when an item is selected
-- A function to get a label to display from an item
+Create a new configuration.
 
 
-    Select.newConfig OnSelect .label
+    Select.newConfig
 -}
-newConfig : (Maybe item -> msg) -> (item -> String) -> Config msg item
-newConfig onSelectMessage toLabel =
-    PrivateConfig (Models.newConfig onSelectMessage toLabel)
+newConfig : Config
+newConfig =
+    PrivateConfig Models.newConfig
 
 
 {-|
@@ -488,16 +489,9 @@ Render the view
 
     Html.map SelectMsg (Select.view selectConfig model.selectState model.items selectedItem)
 -}
-view : Config msg item -> State -> List item -> Maybe item -> Html (Msg item)
-view config model items selected =
-    let
-        config_ =
-            unwrapConfig config
-
-        model_ =
-            unwrapModel model
-    in
-        Html.map PrivateMsg (Select.Select.view config_ model_ items selected)
+view : Config -> ViewArgs msg item -> Html msg
+view (PrivateConfig config) viewArgs =
+    Select.Select.view config viewArgs
 
 
 {-|

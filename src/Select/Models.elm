@@ -1,68 +1,60 @@
 module Select.Models exposing (..)
 
+import Html
+
 
 type alias Style =
     ( String, String )
 
 
-type alias Config msg item =
-    { clearClass : String
-    , clearStyles : List Style
-    , clearSvgClass : String
+type alias Config msg =
+    { clearAttrs : List (Html.Attribute msg)
+    , clearSvgAttrs : List (Html.Attribute msg)
     , cutoff : Maybe Int
     , fuzzySearchAddPenalty : Maybe Int
     , fuzzySearchMovePenalty : Maybe Int
     , fuzzySearchRemovePenalty : Maybe Int
     , fuzzySearchSeparators : List String
-    , inputClass : String
-    , inputStyles : List Style
-    , inputWrapperClass : String
-    , inputWrapperStyles : List Style
-    , itemClass : String
-    , itemStyles : List Style
-    , menuClass : String
-    , menuStyles : List Style
+    , inputAttrs : List (Html.Attribute msg)
+    , inputWrapperAttrs : List (Html.Attribute msg)
+    , itemAttrs : List (Html.Attribute msg)
+    , menuAttrs : List (Html.Attribute msg)
     , notFound : String
-    , notFoundClass : String
-    , notFoundStyles : List Style
-    , onQueryChange : Maybe (String -> msg)
-    , onSelect : Maybe item -> msg
+    , notFoundAttrs : List (Html.Attribute msg)
     , prompt : String
-    , promptClass : String
-    , promptStyles : List Style
+    , promptAttrs : List (Html.Attribute msg)
     , scoreThreshold : Int
+    }
+
+
+type alias ViewArgs msg item =
+    { id : String
+    , items : List item
+    , onSelect : Maybe item -> msg
+    , query : Maybe String
+    , selected : Maybe item
     , toLabel : item -> String
     }
 
 
-newConfig : (Maybe item -> msg) -> (item -> String) -> Config msg item
-newConfig onSelect toLabel =
-    { clearClass = ""
-    , clearStyles = []
-    , clearSvgClass = ""
+newConfig : Config msg
+newConfig =
+    { clearAttrs = []
+    , clearSvgAttrs = []
     , cutoff = Nothing
     , fuzzySearchAddPenalty = Nothing
     , fuzzySearchMovePenalty = Nothing
     , fuzzySearchRemovePenalty = Nothing
     , fuzzySearchSeparators = []
-    , inputClass = ""
-    , inputStyles = []
-    , inputWrapperClass = ""
-    , inputWrapperStyles = []
-    , itemClass = ""
-    , itemStyles = []
-    , menuClass = ""
-    , menuStyles = []
+    , inputAttrs = []
+    , inputWrapperAttrs = []
+    , itemAttrs = []
+    , menuAttrs = []
     , notFound = "No results found"
-    , notFoundClass = ""
-    , notFoundStyles = []
-    , onQueryChange = Nothing
-    , onSelect = onSelect
+    , notFoundAttrs = []
     , prompt = ""
-    , promptClass = ""
-    , promptStyles = []
+    , promptAttrs = []
     , scoreThreshold = 500
-    , toLabel = toLabel
     }
 
 

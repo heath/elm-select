@@ -8,11 +8,11 @@ import Select.Select.Item as Item
 import Select.Utils as Utils
 
 
-view : Config msg item -> State -> List item -> Maybe item -> Html (Msg item)
-view config model items selected =
+view : Config msg -> ViewArgs msg item -> Html msg
+view config viewArgs =
     let
         relevantItems =
-            Utils.matchedItems config model items
+            Utils.matchedItems config viewArgs
 
         withCutoff =
             case config.cutoff of

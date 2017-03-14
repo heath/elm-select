@@ -13,9 +13,9 @@ referenceDataName =
     "data-select-id"
 
 
-referenceAttr : Config msg item -> State -> Attribute msg2
-referenceAttr config model =
-    attribute referenceDataName model.id
+referenceAttr : Config msg -> ViewArgs msg item -> Attribute msg
+referenceAttr config viewArgs =
+    attribute referenceDataName viewArgs.id
 
 
 fuzzyOptions config =
@@ -52,32 +52,32 @@ fuzzyMovePenalty config options =
             options
 
 
-matchedItems : Config msg item -> State -> List item -> List item
-matchedItems config model items =
-    case model.query of
+matchedItems : Config msg -> ViewArgs msg item -> List item
+matchedItems config viewArgs =
+    case viewArgs.query of
         Nothing ->
-            items
+            viewArgs.items
 
         Just query ->
             let
                 scoreFor =
-                    scoreForItem config query
+                    scoreForItem config viewArgs query
             in
-                items
+                viewArgs.items
                     |> List.map (\item -> ( scoreFor item, item ))
                     |> List.filter (\( score, item ) -> score < config.scoreThreshold)
                     |> List.sortBy Tuple.first
                     |> List.map Tuple.second
 
 
-scoreForItem : Config msg item -> String -> item -> Int
-scoreForItem config query item =
+scoreForItem : Config msg -> ViewArgs msg item -> String -> item -> Int
+scoreForItem config viewArgs query item =
     let
         lowerQuery =
             String.toLower query
 
         lowerItem =
-            config.toLabel item
+            viewArgs.toLabel item
                 |> String.toLower
 
         options =

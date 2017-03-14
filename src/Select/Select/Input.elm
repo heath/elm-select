@@ -4,63 +4,26 @@ import Html exposing (..)
 import Html.Attributes exposing (attribute, class, placeholder, value, style)
 import Html.Events exposing (on, onInput, onWithOptions)
 import Json.Decode as Decode
-import Select.Events exposing (onEsc, onBlurAttribute)
+import Select.Events exposing (onEsc)
 import Select.Messages exposing (..)
 import Select.Models exposing (..)
 import Select.Select.Clear as Clear
 import Select.Utils exposing (referenceAttr)
 
 
-view : Config msg item -> State -> Maybe item -> Html (Msg item)
-view config model selected =
+inputWrapperAttrs config =
+    [ class "elm-select-input-wrapper"
+    , style [ ( "position", "relative" ) ]
+    ]
+        ++ config.inputWrapperAttrs
+
+
+inputAttrs config viewArgs =
     let
-        rootClasses =
-            "elm-select-input-wrapper " ++ config.inputWrapperClass
-
-        rootStyles =
-            List.append [ ( "position", "relative" ) ] config.inputWrapperStyles
-
-        ( promptClass, promptStyles ) =
-            case selected of
+        currentValue =
+            case viewArgs.query of
                 Nothing ->
-                    ( config.promptClass, config.promptStyles )
-
-                Just _ ->
-                    ( "", [] )
-
-        inputClasses =
-            String.join " "
-                [ "elm-select-input"
-                , config.inputClass
-                , promptClass
-                ]
-
-        inputStyles =
-            List.concat
-                [ [ ( "width", "100%" ) ]
-                , config.inputStyles
-                , promptStyles
-                ]
-
-        clearClasses =
-            "elm-select-clear " ++ config.clearClass
-
-        clearStyles =
-            List.append
-                [ ( "cursor", "pointer" )
-                , ( "height", "1rem" )
-                , ( "line-height", "0rem" )
-                , ( "margin-top", "-0.5rem" )
-                , ( "position", "absolute" )
-                , ( "right", "0.25rem" )
-                , ( "top", "50%" )
-                ]
-                config.clearStyles
-
-        val =
-            case model.query of
-                Nothing ->
-                    case selected of
+                    case viewArgs.selected of
                         Nothing ->
                             ""
 
@@ -70,34 +33,74 @@ view config model selected =
                 Just str ->
                     str
 
+        baseAttrs =
+            [ class "elm-select-input"
+            , style [ ( "width", "100%" ) ]
+              --, onBlurAttribute config model
+            , onEsc OnEsc
+            , onInput OnQueryChange
+            , placeholder config.prompt
+            , referenceAttr config viewArgs
+            , value currentValue
+            ]
+
+        promptAttrs =
+            case viewArgs.selected of
+                Nothing ->
+                    config.promptAttrs
+
+                Just _ ->
+                    []
+    in
+        baseAttrs
+            ++ config.inputAttrs
+            ++ promptAttrs
+
+
+clearAttrs config viewArgs =
+    let
         onClickWithoutPropagation msg =
             Decode.succeed msg
                 |> onWithOptions "click" { stopPropagation = True, preventDefault = False }
 
-        clear =
-            case selected of
-                Nothing ->
-                    text ""
+        baseStyles =
+            [ ( "cursor", "pointer" )
+            , ( "height", "1rem" )
+            , ( "line-height", "0rem" )
+            , ( "margin-top", "-0.5rem" )
+            , ( "position", "absolute" )
+            , ( "right", "0.25rem" )
+            , ( "top", "50%" )
+            ]
 
-                Just _ ->
-                    div
-                        [ class clearClasses
-                        , onClickWithoutPropagation OnClear
-                        , style clearStyles
-                        ]
-                        [ Clear.view config ]
+        baseAttrs =
+            [ class "elm-select-clear"
+            , style baseStyles
+            , onClickWithoutPropagation OnClear
+            ]
     in
-        div [ class rootClasses, style rootStyles ]
-            [ input
-                [ class inputClasses
-                , onBlurAttribute config model
-                , onEsc OnEsc
-                , onInput OnQueryChange
-                , placeholder config.prompt
-                , referenceAttr config model
-                , style inputStyles
-                , value val
-                ]
-                []
-            , clear
+        baseAttrs ++ config.clearAttrs
+
+
+clearView config viewArgs =
+    case viewArgs.selected of
+        Nothing ->
+            text ""
+
+        Just _ ->
+            div (clearAttrs config viewArgs) [ Clear.view config ]
+
+
+view : Config msg -> ViewArgs msg item -> Html msg
+view config viewArgs =
+    let
+        inputWrapperAttrs_ =
+            inputWrapperAttrs config
+
+        inputAttrs_ =
+            inputAttrs config viewArgs
+    in
+        div inputWrapperAttrs_
+            [ input inputAttrs_ []
+            , clearView config viewArgs
             ]
