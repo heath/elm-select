@@ -6,5 +6,6 @@ type Msg item
     | OnBlur
     | OnClear
     | OnEsc
+    | OnFocus
     | OnQueryChange String
     | OnSelect item

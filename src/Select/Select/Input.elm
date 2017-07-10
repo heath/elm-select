@@ -2,7 +2,7 @@ module Select.Select.Input exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (attribute, class, placeholder, value, style)
-import Html.Events exposing (on, onInput, onWithOptions)
+import Html.Events exposing (on, onFocus, onInput, onWithOptions)
 import Json.Decode as Decode
 import Select.Events exposing (onEsc, onBlurAttribute)
 import Select.Messages exposing (..)
@@ -105,6 +105,7 @@ view config model selected =
                 [ class inputClasses
                 , onBlurAttribute config model
                 , onEsc OnEsc
+                , onFocus OnFocus
                 , onInput OnQueryChange
                 , placeholder config.prompt
                 , referenceAttr config model

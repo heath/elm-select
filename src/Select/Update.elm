@@ -15,7 +15,12 @@ update config msg model =
             ( { model | query = Nothing }, Cmd.none )
 
         OnBlur ->
-            ( { model | query = Nothing }, Cmd.none )
+            ( { model
+                  | query = Nothing
+                  , focus = False
+              }
+            , Cmd.none
+            )
 
         OnClear ->
             let
@@ -24,6 +29,20 @@ update config msg model =
                         |> Task.perform config.onSelect
             in
                 ( { model | query = Nothing }, cmd )
+
+        OnFocus ->
+            let
+                cmd =
+                    case config.onFocus of
+                        Nothing ->
+                            Cmd.none
+
+                        Just msg ->
+                            Task.succeed Nothing
+                                |> Task.perform (\x -> msg)
+
+            in
+                ( { model | focus = True }, cmd )
 
         OnQueryChange value ->
             let

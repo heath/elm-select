@@ -2,7 +2,7 @@ module Example1 exposing (..)
 
 import Debug
 import Html exposing (..)
-import Html.Attributes exposing (class)
+import Html.Attributes exposing (class, style)
 import Movies
 import Select
 
@@ -15,7 +15,6 @@ type alias Movie =
     , label : String
     }
 
-
 {-| In your main application model you should store:
 
   - The selected item e.g. selectedMovieId
@@ -23,11 +22,18 @@ type alias Movie =
 
 -}
 type alias Model =
-    { id : String
+    { focusedField : Maybe InputField
+    , id : String
     , movies : List Movie
     , selectedMovieId : Maybe String
     , selectState : Select.State
     }
+
+
+{-| A field which may be focused
+-}
+type InputField
+    = MovieInput
 
 
 {-| This just transforms a list of tuples into records
@@ -41,7 +47,8 @@ movies =
 -}
 initialModel : String -> Model
 initialModel id =
-    { id = id
+    { focusedField = Nothing
+    , id = id
     , movies = movies
     , selectedMovieId = Nothing
     , selectState = Select.newState id
@@ -55,7 +62,8 @@ initialModel id =
 
 -}
 type Msg
-    = NoOp
+    = FocusField InputField
+    | NoOp
     | OnSelect (Maybe Movie)
     | SelectMsg (Select.Msg Movie)
 
@@ -80,6 +88,7 @@ selectConfig : Select.Config Msg Movie
 selectConfig =
     Select.newConfig OnSelect .label
         |> Select.withCutoff 12
+        |> Select.withOnFocus (FocusField MovieInput)
         |> Select.withInputClass "col-12"
         |> Select.withInputStyles [ ( "padding", "0.5rem" ), ( "outline", "none" ) ]
         |> Select.withItemClass "border-bottom border-silver p1 gray"
@@ -122,6 +131,9 @@ update msg model =
             in
                 ( { model | selectState = updated }, cmd )
 
+        FocusField field ->
+            ( { model | focusedField = Just field } , Cmd.none )
+
         NoOp ->
             ( model, Cmd.none )
 
@@ -139,6 +151,13 @@ view model =
                 Just id ->
                     List.filter (\movie -> movie.id == id) movies
                         |> List.head
+        inputLabel =
+            if model.focusedField == Just MovieInput then
+                h4
+                    [ style [ ("color", "green") ] ]
+                    [ text "Pick a movie" ]
+            else
+                h4 [] [ text "Pick a movie" ]
     in
         div [ class "bg-silver p1" ]
             [ h3 [] [ text "Basic example" ]
@@ -150,6 +169,6 @@ view model =
             -- - The Select internal state
             -- - A list of items
             -- - The currently selected item as Maybe
-            , h4 [] [ text "Pick a movie" ]
+            , inputLabel
             , Html.map SelectMsg (Select.view selectConfig model.selectState model.movies selectedMovie)
             ]

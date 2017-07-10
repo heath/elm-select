@@ -29,6 +29,7 @@ module Select
         , withNotFoundClass
         , withNotFoundShown
         , withNotFoundStyles
+        , withOnFocus
         , withOnQuery
         , withPrompt
         , withPromptClass
@@ -47,7 +48,7 @@ module Select
 
 # Configuration
 
-@docs newConfig, withCutoff, withOnQuery
+@docs newConfig, withCutoff, withOnFocus, withOnQuery
 
 
 # Configure the clear button
@@ -393,6 +394,20 @@ withNotFoundStyles styles config =
     let
         fn c =
             { c | notFoundStyles = styles }
+    in
+        fmapConfig fn config
+
+
+{-| Add a callback for when input has focus
+
+    Select.withOnFocus OnFocus
+
+-}
+withOnFocus : msg -> Config msg item -> Config msg item
+withOnFocus msg config =
+    let
+        fn c =
+            { c | onFocus = Just msg }
     in
         fmapConfig fn config
 
